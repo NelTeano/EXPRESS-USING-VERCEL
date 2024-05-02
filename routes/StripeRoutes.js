@@ -1,10 +1,9 @@
 import stripe from "stripe"
 import express from "express";
 
-const stripePackage = stripe('sk_test_...');
+const stripePackage = stripe(process.env.STRIPE_SECRET_KEY);
 
 const StripeRoute = express.Router();
-
 
 
 StripeRoute.post('/webhook', express.raw({type: 'application/json'}), (request, response) => {
@@ -19,7 +18,7 @@ StripeRoute.post('/webhook', express.raw({type: 'application/json'}), (request, 
         return;
         }
         
-    
+        
         // Handle the event
         switch (event.type) {
         case 'charge.refunded':
