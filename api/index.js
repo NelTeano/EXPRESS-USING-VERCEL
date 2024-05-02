@@ -23,8 +23,11 @@ app.use(cors({
         'http://localhost:3000',
         'http://localhost:3001/Home',
         'https://reward-funding-website.vercel.app/',
-        'https://reward-funding-website.vercel.app/Home'
-    ],  // THE HTTP(ORIGIN) THAT WILL ALLOW TO ACCESS THE ROUTES
+        'https://reward-funding-website.vercel.app/Home',
+        'https://reward-funding-website.vercel.app',
+        'https://deploy-express-vercel-ashy.vercel.app/api/users'
+    ],  
+    // THE HTTP(ORIGIN) THAT WILL ALLOW TO ACCESS THE ROUTES
     credentials: true,
 }));
 
