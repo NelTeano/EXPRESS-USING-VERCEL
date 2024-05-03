@@ -1,10 +1,15 @@
 import stripe from "stripe"
 import express from "express";
+import dotenv from "dotenv";
 
-const stripePackage = stripe(process.env.STRIPE_SECRET_KEY);
+dotenv.config();      // ACCESS .ENV 
+
+const stripePackage = stripe(
+    process.env.STRIPE_SECRET_KEY,
+);
+
 
 const StripeRoute = express.Router();
-
 
 StripeRoute.post('/webhook', express.raw({type: 'application/json'}), (request, response) => {
         const sig = request.headers['stripe-signature'];
@@ -46,5 +51,21 @@ StripeRoute.post('/webhook', express.raw({type: 'application/json'}), (request, 
         response.send();
 });
 
+
+StripeRoute.get('/products', async (req, res) => {
+
+    try {
+        const ProductList = await stripePackage.products.list(
+        {
+            limit: 3
+        }, 
+    );
+
+        res.send(ProductList);
+        console.log("Get Products Data Success");
+    } catch (error) {
+        console.log("Failed to GET the products:", error);
+    }
+});
 
 export default StripeRoute;

@@ -10,6 +10,7 @@ import { initDatabase } from './database.js'
 import userRoutes from '../routes/UserRoutes.js'
 import StripeRoutes from '../routes/StripeRoutes.js';
 
+
 const app = express();
 dotenv.config();      // ACCESS .ENV 
 initDatabase();
