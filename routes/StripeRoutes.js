@@ -52,12 +52,15 @@ StripeRoute.post('/webhook', express.raw({type: 'application/json'}), (request, 
 });
 
 
-StripeRoute.get('/products', async (req, res) => {
+// GET ALL PROUCTS WITH LIMIT
+StripeRoute.get('/products/:limit', async (req, res) => {
+
+    const getLimit = req.params.limit;
 
     try {
         const ProductList = await stripePackage.products.list(
         {
-            limit: 3
+            limit: getLimit
         }, 
     );
 
@@ -67,5 +70,70 @@ StripeRoute.get('/products', async (req, res) => {
         console.log("Failed to GET the products:", error);
     }
 });
+
+
+
+
+
+
+// CREATE A PRODUCT
+StripeRoute.post('/create-product', async (req, res) => {
+
+    const name = req.body.name;
+    const description = req.body.description;
+    const product_price = req.body.price;
+    const images =  req.body.images;
+
+    try {
+
+        const product = await stripePackage.products.create({
+            name: name,
+            description: description,
+            images: images,
+            active: true,
+            default_price_data: {
+                currency: 'php',
+                unit_amount: product_price
+            }
+        });
+
+        res.status(200).send('Product Create Successfully!'); // Sending success message
+    } catch(error) {
+        res.status(400).send('Failed to POST product: ' + error); // Sending error message
+    }
+});
+
+
+
+// ACTIVATE PAYMENT LINK OF A PRODUCT
+StripeRoute.post('/payment_links/:id', async (req, res) => {
+
+    const product_id = req.params.id; // Accessing id parameter from URL
+    const quantity = req.body.quantity;
+
+    try {
+        const paymentLink = await stripePackage.paymentLinks.create({
+            line_items: [
+                {
+                    price: product_id,
+                    quantity: quantity,
+                },
+            ],
+            after_completion: {
+                type: 'redirect',
+                redirect: {
+                    url: 'https://reward-funding-website.vercel.app/',
+                },
+            },
+        });
+
+        res.status(200).send('Product Link Created Successfully! Here is the payment link : ' + JSON.stringify(paymentLink.url) + ' Object : ' + JSON.stringify(paymentLink)); // Sending success message
+    } catch(error) {
+        res.status(400).send('Failed to create payment link: ' + error.message); // Sending error message
+    }
+});
+
+
+
 
 export default StripeRoute;
