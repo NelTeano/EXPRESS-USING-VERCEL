@@ -2,6 +2,16 @@ import stripe from "stripe"
 import express from "express";
 import dotenv from "dotenv";
 
+import {
+    GetAllProducts,
+    GetAllTransactions,
+    GetAllOrders,
+    GetAllSessions,
+    createCheckout,
+    createProduct,
+    createPaymentLink
+} from '../controllers/stripeControllers.js'
+
 dotenv.config();      // ACCESS .ENV 
 
 const stripePackage = stripe(
@@ -52,88 +62,19 @@ StripeRoute.post('/webhook', express.raw({type: 'application/json'}), (request, 
 });
 
 
-// GET ALL PROUCTS WITH LIMIT
-StripeRoute.get('/products/:limit', async (req, res) => {
+StripeRoute.get('/products/:limit', GetAllProducts);
 
-    const getLimit = req.params.limit;
+StripeRoute.get('/transactions', GetAllTransactions);
 
-    try {
-        const ProductList = await stripePackage.products.list(
-        {
-            limit: getLimit
-        }, 
-    );
+StripeRoute.get('/orders', GetAllOrders);
 
-        res.send(ProductList);
-        console.log("Get Products Data Success");
-    } catch (error) {
-        console.log("Failed to GET the products:", error);
-    }
-});
+StripeRoute.get('/checkout-sessions', GetAllSessions);
 
+StripeRoute.post("/create-checkout-session", createCheckout);
 
+StripeRoute.post('/create-product', createProduct);
 
-
-
-
-// CREATE A PRODUCT
-StripeRoute.post('/create-product', async (req, res) => {
-
-    const name = req.body.name;
-    const description = req.body.description;
-    const product_price = req.body.price;
-    const images =  req.body.images;
-
-    try {
-
-        const product = await stripePackage.products.create({
-            name: name,
-            description: description,
-            images: images,
-            active: true,
-            default_price_data: {
-                currency: 'php',
-                unit_amount: product_price
-            }
-        });
-
-        res.status(200).send('Product Create Successfully!'); // Sending success message
-    } catch(error) {
-        res.status(400).send('Failed to POST product: ' + error); // Sending error message
-    }
-});
-
-
-
-// ACTIVATE PAYMENT LINK OF A PRODUCT
-StripeRoute.post('/payment_links/:id', async (req, res) => {
-
-    const product_id = req.params.id; // Accessing id parameter from URL
-    const quantity = req.body.quantity;
-
-    try {
-        const paymentLink = await stripePackage.paymentLinks.create({
-            line_items: [
-                {
-                    price: product_id,
-                    quantity: quantity,
-                },
-            ],
-            after_completion: {
-                type: 'redirect',
-                redirect: {
-                    url: 'https://reward-funding-website.vercel.app/',
-                },
-            },
-        });
-
-        res.status(200).send('Product Link Created Successfully! Here is the payment link : ' + JSON.stringify(paymentLink.url) + ' Object : ' + JSON.stringify(paymentLink)); // Sending success message
-    } catch(error) {
-        res.status(400).send('Failed to create payment link: ' + error.message); // Sending error message
-    }
-});
-
-
+StripeRoute.post('/payment_links/:id', createPaymentLink);
 
 
 export default StripeRoute;
