@@ -8,17 +8,19 @@ const stripePackage = stripe(
 );
 
 
-// GET ALL PROUCTS WITH LIMIT
+// GET ALL PROUCTS WITH PRICES AND LIMIT
 const GetAllProducts = async (req, res) => {
 
     const getLimit = req.params.limit;
 
     try {
         const ProductList = await stripePackage.products.list(
-        {
-            limit: getLimit
-        }, 
-    );
+            {
+                limit: getLimit,
+                active: true,
+                expand: ['data.default_price'],
+            }, 
+        );
 
         res.send(ProductList);
         console.log("Get Products Data Success");

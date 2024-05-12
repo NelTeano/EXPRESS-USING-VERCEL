@@ -32,11 +32,11 @@ app.use(cors({
     credentials: true,
 }));
 
-
+const PORT = 3001;
 
 app.get("/", (req, res) => res.send("Express on Vercel"));
 
-app.listen(3001, () => console.log("Server ready on port 3001."));
+app.listen(PORT, () => console.log(`Server ready on port http://localhost:${PORT}`));
 
 
 // USE ROUTES
