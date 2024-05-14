@@ -90,33 +90,34 @@ const storeItems = new Map([
 
 // CREATE CHECKOUT SESSION
 const createCheckout = async (req, res) => {
-
-        try {
+    try {
         const session = await stripePackage.checkout.sessions.create({
-            payment_method_types: ["card"],
-            mode: "payment",
+            payment_method_types: ['card'],
+            mode: 'payment',
             line_items: req.body.items.map(item => {
                 const storeItem = storeItems.get(parseInt(item.id));
 
                 return {
                     price_data: {
-                        currency: "usd",
+                        currency: 'usd',
                         product_data: {
                             name: storeItem.name,
+                            description: `Size: ${item.size}`,  // Add size to description
                         },
                         unit_amount: storeItem.priceInCents,
                     },
                     quantity: item.quantity,
-                }
+                };
             }),
-            success_url: `https://reward-funding-website.vercel.app/`,
-            cancel_url: `https://reward-funding-website.vercel.app/Home`,
-        })
-        res.json({ url: session.url })
-        } catch (e) {
-        res.status(500).json({ error: e.message })
-        }
-}
+            success_url: 'https://reward-funding-website.vercel.app/',
+            cancel_url: 'https://reward-funding-website.vercel.app/Home',
+        });
+        res.json({ url: session.url });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+};
+
 
 
 

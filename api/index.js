@@ -7,8 +7,9 @@ import cors from 'cors';
 import { initDatabase } from './database.js'
 
 // ROUTES
-import userRoutes from '../routes/UserRoutes.js'
+import userRoutes from '../routes/UserRoutes.js';
 import StripeRoutes from '../routes/StripeRoutes.js';
+import productRoutes from '../routes/ProductRoutes.js'
 
 
 const app = express();
@@ -41,6 +42,7 @@ app.listen(PORT, () => console.log(`Server ready on port http://localhost:${PORT
 
 // USE ROUTES
 app.use('/api', userRoutes);
+app.use('/api', productRoutes);
 app.use('/api', StripeRoutes);
 
 export default app;
