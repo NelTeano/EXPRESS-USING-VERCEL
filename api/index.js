@@ -42,7 +42,7 @@ app.use(cors({
 
 const PORT = 3001;
 
-app.get("/", (req, res) => res.send("Express on Vercel"));
+app.get("/", (req, res) => res.send(`Express on Vercel ${process.env.ENDPOINT_SECRET}`));
 
 app.listen(PORT, () => console.log(`Server ready on port http://localhost:${PORT}`));
 
