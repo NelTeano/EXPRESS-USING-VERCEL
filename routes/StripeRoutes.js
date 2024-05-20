@@ -9,7 +9,7 @@ import {
     GetAllSessions,
     createCheckout,
     createProduct,
-    createPaymentLink
+    createPaymentLink,
 } from '../controllers/stripeControllers.js'
 
 dotenv.config();      // ACCESS .ENV 
@@ -21,13 +21,16 @@ const stripePackage = stripe(
 
 const StripeRoute = express.Router();
 
-StripeRoute.post('/webhook', express.raw({type: 'application/json'}), (request, response) => {
+
+
+
+StripeRoute.post('/webhook', express.raw({type: 'application/json'}), async (request, response) => {
         const sig = request.headers['stripe-signature'];
     
         let event;
     
         try {
-            event = stripePackage.webhooks.constructEvent(request.body, sig, process.env.ENDPOINT_SECRET);
+            event = await stripePackage.webhooks.constructEvent(request.body, sig, process.env.ENDPOINT_SECRET);
         } catch (err) {
             console.log(`❌ Error message: ${err.message}`);
             response.status(400).send(`Webhook Error: ${err.message}`);
@@ -39,8 +42,21 @@ StripeRoute.post('/webhook', express.raw({type: 'application/json'}), (request, 
         switch (event.type) {
         case 'checkout.session.completed':
             const checkoutSessionCompleted = event.data.object;
-            console.log("success checkout session now can execute functions here !", checkoutSessionCompleted);
+
+            try {
+
+                const lineItems = await stripePackage.checkout.sessions.listLineItems(
+                    checkoutSessionCompleted.id
+                );
+
+                console.log("Success! Checkout session completed.");
+                console.log("Checkout Session:", checkoutSessionCompleted);
+                console.log("Line of Items :", lineItems);
+            } catch (err) {
+                console.log(`❌ Error retrieving payment method: ${err.message}`);
+            }
             break;
+
         // ... handle other event types
         case 'checkout.session.async_payment_failed':
             const checkoutSessionAsyncPaymentFailed = event.data.object;
