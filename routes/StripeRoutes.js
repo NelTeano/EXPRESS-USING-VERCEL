@@ -27,15 +27,29 @@ StripeRoute.post('/webhook', express.raw({type: 'application/json'}), (request, 
         let event;
     
         try {
-        event = stripePackage.webhooks.constructEvent(request.body, sig, process.env.ENDPOINT_SECRET);
+            event = stripePackage.webhooks.constructEvent(request.body, sig, process.env.ENDPOINT_SECRET);
         } catch (err) {
-        response.status(400).send(`Webhook Error: ${err.message}`);
-        return;
+            console.log(`❌ Error message: ${err.message}`);
+            response.status(400).send(`Webhook Error: ${err.message}`);
+            return;
         }
         
         
         // Handle the event
         switch (event.type) {
+        case 'checkout.session.completed':
+            const checkoutSessionCompleted = event.data.object;
+            console.log("success checkout session now can execute functions here !", checkoutSessionCompleted);
+            break;
+        // ... handle other event types
+        case 'checkout.session.async_payment_failed':
+            const checkoutSessionAsyncPaymentFailed = event.data.object;
+            // Then define and call a function to handle the event checkout.session.async_payment_failed
+            break;
+        case 'checkout.session.async_payment_succeeded':
+            const checkoutSessionAsyncPaymentSucceeded = event.data.object;
+            // Then define and call a function to handle the event checkout.session.async_payment_succeeded
+        break;
         case 'charge.refunded':
             const chargeRefunded = event.data.object;
             // Then define and call a function to handle the event charge.refunded
@@ -56,9 +70,8 @@ StripeRoute.post('/webhook', express.raw({type: 'application/json'}), (request, 
         default:
             console.log(`Unhandled event type ${event.type}`);
         }
-    
         // Return a 200 response to acknowledge receipt of the event
-        response.send();
+        response.json({received: true});
 });
 
 
