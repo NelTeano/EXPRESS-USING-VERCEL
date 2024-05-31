@@ -12,6 +12,20 @@ const getUsers = async (req, res) => {
     }
 }
 
+const getUserById = async (req, res) => {
+
+    const userId = req.params.id
+
+    try {
+        const usersData = await UserModel.findById(userId)
+        res.send(usersData);
+        console.log("Get User by ID Data Success");
+    } catch (error) {
+        console.log("Failed getting User by ID data", error);
+        res.status(500).json({ message: "Error User by ID", error });
+    }
+}
+
 const saveUserAfterLogin = async (req, res) => {
 
     const user = new UserModel({
@@ -33,4 +47,4 @@ const saveUserAfterLogin = async (req, res) => {
     }
 }
 
-export { getUsers, saveUserAfterLogin } 
+export { getUsers, getUserById, saveUserAfterLogin } 
