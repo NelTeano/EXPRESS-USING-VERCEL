@@ -4,13 +4,15 @@ import express from "express";
 import { 
     getUsers, 
     getUserById, 
-    saveUserAfterLogin
+    saveUser,
+    checkUserRegistered
 } from '../controllers/userControllers.js'
 
 const userRoute = express.Router();
 
 userRoute.get('/users', getUsers);
 userRoute.get('/users/:id', getUserById);
-userRoute.post('/save-user', saveUserAfterLogin);
+userRoute.get('/check-register/:email', checkUserRegistered);
+userRoute.post('/save-user', saveUser);
 
 export default userRoute;

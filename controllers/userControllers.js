@@ -26,7 +26,7 @@ const getUserById = async (req, res) => {
     }
 }
 
-const saveUserAfterLogin = async (req, res) => {
+const saveUser = async (req, res) => {
 
     const user = new UserModel({
         subId: req.body.subId,
@@ -47,4 +47,22 @@ const saveUserAfterLogin = async (req, res) => {
     }
 }
 
-export { getUsers, getUserById, saveUserAfterLogin } 
+const checkUserRegistered = async (req, res) => {
+    const userEmail = req.params.email;
+
+    try {
+        const user = await UserModel.findOne({ email: userEmail });
+        
+        if (user) {
+            res.status(200).json(true);
+        } else {
+            res.status(200).json(false);
+        }
+    } catch (error) {
+        console.error("Failed checkUserRegistered function:", error);
+        res.status(400).json({ message: "Error in checkUserRegistered function", error: error.message });
+    }
+}
+
+
+export { getUsers, getUserById, saveUser, checkUserRegistered } 
