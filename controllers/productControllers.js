@@ -12,4 +12,27 @@ const getProducts = async (req, res) => {
     }
 }
 
-export { getProducts } 
+const saveProduct = async (req, res) => {
+
+    const product = new ProductModel({
+        name: req.body.name,
+        price: req.body.price,
+        organization_owner: req.body.org,
+        description: req.body.description,
+        image: req.body.img,
+        catergory: req.body.category,
+        variation: req.body.var,
+    })
+
+
+    try {
+        const addProduct = await product.save();
+        res.send(addProduct);
+        console.log("Add product Success");
+    } catch (error) {
+        console.log("Failed adding the product data", error);
+        res.status(400).json({ message: "Error adding products", error });
+    }
+}
+
+export { getProducts, saveProduct } 

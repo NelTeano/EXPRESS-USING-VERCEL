@@ -3,19 +3,32 @@ import { Timestamp } from "mongodb";
 
 const ProductSchemma = mongoose.Schema({
     name: {
-        type: String
+        type: String,
+        required: true
     },
     price: {
         type: Number,
+        required: true
     },
     organization_owner: {
         type: String,
+        required: true
     },
     description: {
         type: String,
+        required: true
     },
-    sizes: {
+    image: {
+        type: String,
+        required: true
+    },
+    catergory: {
+        type: String,
+        required: true
+    },
+    variation: {
         type: Array,
+        required: true
     },
 })
 
