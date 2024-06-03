@@ -1,5 +1,5 @@
 import ProductModel from "../models/Product.js";
-
+import UserModel from "../models/User.js";
 
 // GET ALL THE PRODUCTS
 const getProducts = async (req, res) => {
@@ -52,6 +52,34 @@ const getFilteredProducts = async (req, res) => {
 };
 
 
+const likeProduct = async (req, res) => {
+    
+    const userEmail = req.params.email;
+    const productId = req.params.prod_id;
+
+    try {
+        
+        const findUser = await UserModel.findOne({ email: userEmail });
+
+        if (!findUser) {
+            return res.status(404).json({ message: 'No Exiting User or Login to Register Data' });
+        }
+
+        const updatedUser = await UserModel.findByIdAndUpdate(
+            findUser._id, 
+            { $push: { product_liked: productId } },
+            { new: true }
+        );
+
+        res.json({ message: 'User updated successfully', updatedData: updatedUser, oldData: findUser});
+    } catch (err) {
+        console.error(`Error: ${err}`);
+        res.status(500).send({ success: false, message: "An error occurred while updating the product.", error: err });
+    }
+}
+
+
+
 const saveProduct = async (req, res) => {
 
     const product = new ProductModel({
@@ -77,4 +105,4 @@ const saveProduct = async (req, res) => {
 
 
 
-export { getProducts, saveProduct, getFilteredProducts } 
+export { getProducts, saveProduct, getFilteredProducts, likeProduct } 
