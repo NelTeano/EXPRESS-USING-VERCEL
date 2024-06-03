@@ -1,5 +1,7 @@
 import ProductModel from "../models/Product.js";
 
+
+// GET ALL THE PRODUCTS
 const getProducts = async (req, res) => {
 
     try {
@@ -11,6 +13,44 @@ const getProducts = async (req, res) => {
         res.status(500).json({ message: "Error Get products", error });
     }
 }
+
+const getFilteredProducts = async (req, res) => {
+    const { organization, category } = req.params;
+    const limit = 12;
+    
+    const decodedOrganization = decodeURIComponent(organization);
+    const decodedCategory = decodeURIComponent(category);
+
+    try {
+        let FilteredProducts;
+
+        if (organization === 'all' && category === 'all') {
+            FilteredProducts = await ProductModel.find({}).limit(limit);
+        } else if (category === 'all') {
+            FilteredProducts = await ProductModel.find({ organization_owner: decodedOrganization })
+                .collation({ locale: 'en', strength: 2 })
+                .limit(limit);
+        } else if (organization === 'all') {
+            FilteredProducts = await ProductModel.find({ catergory: decodedCategory })
+                .collation({ locale: 'en', strength: 2 })
+                .limit(limit);
+        } else {
+            FilteredProducts = await ProductModel.find({
+                organization_owner: decodedOrganization,
+                catergory: decodedCategory
+            })
+                .collation({ locale: 'en', strength: 2 })
+                .limit(limit);
+        }
+
+        res.send(FilteredProducts);
+        console.log("Get products Data Success", organization, category);
+    } catch (error) {
+        console.log("Failed getting the products data", error);
+        res.status(500).json({ message: "Error getting products", error });
+    }
+};
+
 
 const saveProduct = async (req, res) => {
 
@@ -35,4 +75,6 @@ const saveProduct = async (req, res) => {
     }
 }
 
-export { getProducts, saveProduct } 
+
+
+export { getProducts, saveProduct, getFilteredProducts } 
