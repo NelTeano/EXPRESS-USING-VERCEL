@@ -3,7 +3,7 @@ import express from "express";
 // CONTROLLERS
 import { 
     getUsers, 
-    getUserById, 
+    getUserByEmail, 
     saveUser,
     checkUserRegistered
 } from '../controllers/userControllers.js'
@@ -11,7 +11,7 @@ import {
 const userRoute = express.Router();
 
 userRoute.get('/users', getUsers);
-userRoute.get('/users/:id', getUserById);
+userRoute.get('/users/:id', getUserByEmail);
 userRoute.get('/check-register/:email', checkUserRegistered);
 userRoute.post('/save-user', saveUser);
 

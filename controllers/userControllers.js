@@ -12,14 +12,14 @@ const getUsers = async (req, res) => {
     }
 }
 
-const getUserById = async (req, res) => {
+const getUserByEmail = async (req, res) => {
 
-    const userId = req.params.id
+    const userEmail = req.params.id
 
     try {
-        const usersData = await UserModel.findById(userId)
-        res.send(usersData);
-        console.log("Get User by ID Data Success");
+        const userData = await UserModel.find({email: userEmail})
+        res.send(userData);
+        console.log("Get User by Email Data Success");
     } catch (error) {
         console.log("Failed getting User by ID data", error);
         res.status(500).json({ message: "Error User by ID", error });
@@ -65,4 +65,4 @@ const checkUserRegistered = async (req, res) => {
 }
 
 
-export { getUsers, getUserById, saveUser, checkUserRegistered } 
+export { getUsers, getUserByEmail, saveUser, checkUserRegistered } 
