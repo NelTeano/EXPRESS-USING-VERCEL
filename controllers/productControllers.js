@@ -25,7 +25,7 @@ const getFilteredProducts = async (req, res) => {
         let FilteredProducts;
 
         if (organization === 'all' && category === 'all') {
-            FilteredProducts = await ProductModel.find({}).limit(limit);
+            FilteredProducts = await ProductModel.find({});
         } else if (category === 'all') {
             FilteredProducts = await ProductModel.find({ organization_owner: decodedOrganization })
                 .collation({ locale: 'en', strength: 2 })
@@ -78,6 +78,28 @@ const likeProduct = async (req, res) => {
     }
 }
 
+const getLikedProduct = async (req, res) => {
+
+    const userEmail = req.params.email;
+
+    try {
+        
+        const findUser = await UserModel.findOne({ email: userEmail });
+
+        if (!findUser) {
+            return res.status(404).json({ message: 'No Exiting User or Login to Register Data' });
+        }
+
+        const findProductsLiked = await ProductModel.find({ _id: { "$in" : findUser.product_liked} });
+        console.log("product liked _ids", findUser.product_liked); // array products _ids
+
+        res.json({ message: 'get liked products successfully', Products: findProductsLiked});
+    } catch (err) {
+        console.error(`Error: ${err}`);
+        res.status(500).send({ success: false, message: "An error occurred while updating the product.", error: err });
+    }
+}
+
 
 
 const saveProduct = async (req, res) => {
@@ -105,4 +127,4 @@ const saveProduct = async (req, res) => {
 
 
 
-export { getProducts, saveProduct, getFilteredProducts, likeProduct } 
+export { getProducts, saveProduct, getFilteredProducts, likeProduct, getLikedProduct } 
