@@ -29,18 +29,18 @@ const getFilteredProducts = async (req, res) => {
         } else if (category === 'all') {
             FilteredProducts = await ProductModel.find({ organization_owner: decodedOrganization })
                 .collation({ locale: 'en', strength: 2 })
-                .limit(limit);
+                // .limit(limit);
         } else if (organization === 'all') {
             FilteredProducts = await ProductModel.find({ catergory: decodedCategory })
                 .collation({ locale: 'en', strength: 2 })
-                .limit(limit);
+                // .limit(limit);
         } else {
             FilteredProducts = await ProductModel.find({
                 organization_owner: decodedOrganization,
                 catergory: decodedCategory
             })
                 .collation({ locale: 'en', strength: 2 })
-                .limit(limit);
+                // .limit(limit);
         }
 
         res.send(FilteredProducts);
