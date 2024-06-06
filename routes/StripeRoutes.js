@@ -99,6 +99,34 @@ StripeRoute.post('/webhook', express.raw({type: 'application/json'}), async (req
             break;
         case 'payment_intent.succeeded':
             const paymentIntentSucceeded = event.data.object;
+
+            try {
+                
+                const lineItems = await stripePackage.checkout.sessions.listLineItems(
+                    paymentIntentSucceeded.id
+                );
+
+                const orderData = {
+                    orderId: paymentIntentSucceeded.id,
+                    customer_details: paymentIntentSucceeded.customer_details,
+                    shipping_details: paymentIntentSucceeded.shipping_details,
+                    shipping_cost: paymentIntentSucceeded.shipping_cost,
+                    line_items: lineItems.data,
+                    amount_total: paymentIntentSucceeded.amount_total,
+                    payment_status: paymentIntentSucceeded.payment_status,
+                };
+
+                const Order = new OrderModel(orderData);
+                const saveOrder = await Order.save();
+
+                console.log("Success! Checkout session completed.");
+                console.log("Checkout Session:", paymentIntentSucceeded);
+                console.log("Line of Items :", lineItems);
+                response.json({received: true, order: saveOrder}); // Sending response here
+                return; // End execution after sending the response
+            } catch (err) {
+                console.log(`❌ Error retrieving payment method: ${err.message}`);
+            }
             // Then define and call a function to handle the event payment_intent.succeeded
             break;
         // ... handle other event types
