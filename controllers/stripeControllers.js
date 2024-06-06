@@ -1,5 +1,6 @@
 import stripe from "stripe"
 import dotenv from "dotenv";
+import OrderModel from "../models/Order.js";
 
 dotenv.config();      // ACCESS .ENV 
 
@@ -63,6 +64,19 @@ const GetAllOrders =  async (req, res) => {
     }
 };
 
+// GET ALL ORDERS FROM DB
+const GetOrdersDB =  async (req, res) => {
+
+
+    try {  
+        const orders = await OrderModel.find({});
+        res.send(orders);
+        console.log("Get orders Data Success");
+    } catch (error) {
+        console.log("Failed to GET the orders:", error);
+    }
+};
+
 
 
 // GET LIST CHECKOUT SESSIONS
@@ -82,35 +96,82 @@ const GetAllSessions = async  (req, res) => {
 };
 
 
-const storeItems = new Map([
-    [1, { priceInCents: 10000, name: "Learn React Today" }],
-    [2, { priceInCents: 20000, name: "Learn CSS Today" }],
-])
+// const storeItems = new Map([
+//     [1, { priceInCents: 10000, name: "Learn React Today" }],
+//     [2, { priceInCents: 20000, name: "Learn CSS Today" }],
+// ])
 
 
 // CREATE CHECKOUT SESSION
 const createCheckout = async (req, res) => {
+
     try {
         const session = await stripePackage.checkout.sessions.create({
+            
             payment_method_types: ['card'],
             mode: 'payment',
             line_items: req.body.items.map(item => {
-                const storeItem = storeItems.get(parseInt(item.id));
-
+                
                 return {
                     price_data: {
-                        currency: 'usd',
+                        currency: 'php',
                         product_data: {
-                            name: storeItem.name,
-                            description: `Size: ${item.size}`,  // Add size to description
+                            name: item.name + " " + item.variation,
+                            description: `Variation : ${item.variation}`,  // Add size to description
+                            images: item.image,
                         },
-                        unit_amount: storeItem.priceInCents,
+                        unit_amount: item.price,
                     },
                     quantity: item.quantity,
                 };
             }),
+            shipping_address_collection: {
+                allowed_countries: ['PH'],
+            },
+            shipping_options: [
+                {
+                    shipping_rate_data: {
+                        type: 'fixed_amount',
+                        fixed_amount: {
+                        amount: 0,
+                        currency: 'php',
+                        },
+                        display_name: 'Free shipping',
+                        delivery_estimate: {
+                            minimum: {
+                                unit: 'business_day',
+                                value: 7,
+                            },
+                            maximum: {
+                                unit: 'business_day',
+                                value: 10,
+                            },
+                        },
+                    },
+                },
+                {
+                    shipping_rate_data: {
+                        type: 'fixed_amount',
+                        fixed_amount: {
+                            amount: 7000,
+                            currency: 'php',
+                        },
+                        display_name: 'Fast Shipping',
+                        delivery_estimate: {
+                            minimum: {
+                                unit: 'business_day',
+                                value: 1,
+                            },
+                            maximum: {
+                                unit: 'business_day',
+                                value: 2,
+                            },
+                        },
+                    },
+                }
+            ],
             success_url: 'https://reward-funding-website.vercel.app/',
-            cancel_url: 'https://reward-funding-website.vercel.app/Home',
+            cancel_url: 'https://reward-funding-website.vercel.app/shop/all/all',
         });
         res.json({ url: session.url });
     } catch (e) {
@@ -189,6 +250,7 @@ export {
     GetAllProducts,
     GetAllTransactions,
     GetAllOrders,
+    GetOrdersDB,
     GetAllSessions,
     createCheckout,
     createProduct,

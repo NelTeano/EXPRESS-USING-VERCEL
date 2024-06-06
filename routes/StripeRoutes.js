@@ -2,10 +2,14 @@ import stripe from "stripe"
 import express from "express";
 import dotenv from "dotenv";
 
+// MODELS
+import OrderModel from "../models/Order.js";
+
 import {
     GetAllProducts,
     GetAllTransactions,
     GetAllOrders,
+    GetOrdersDB,
     GetAllSessions,
     createCheckout,
     createProduct,
@@ -20,7 +24,6 @@ const stripePackage = stripe(
 
 
 const StripeRoute = express.Router();
-
 
 
 
@@ -43,15 +46,30 @@ StripeRoute.post('/webhook', express.raw({type: 'application/json'}), async (req
         case 'checkout.session.completed':
             const checkoutSessionCompleted = event.data.object;
 
-            try {
 
+            try {
+                
                 const lineItems = await stripePackage.checkout.sessions.listLineItems(
                     checkoutSessionCompleted.id
                 );
 
+                const orderData = {
+                    orderId: checkoutSessionCompleted.id,
+                    customer_details: checkoutSessionCompleted.customer_details,
+                    shipping_details: checkoutSessionCompleted.shipping_details,
+                    shipping_cost: checkoutSessionCompleted.shipping_cost,
+                    line_items: lineItems.data,
+                    amount_total: checkoutSessionCompleted.amount_total,
+                    payment_status: checkoutSessionCompleted.payment_status,
+                };
+
+                const Order = new OrderModel(orderData);
+                await Order.save();
+
                 console.log("Success! Checkout session completed.");
                 console.log("Checkout Session:", checkoutSessionCompleted);
                 console.log("Line of Items :", lineItems);
+
             } catch (err) {
                 console.log(`❌ Error retrieving payment method: ${err.message}`);
             }
@@ -96,6 +114,8 @@ StripeRoute.get('/products/:limit', GetAllProducts);
 StripeRoute.get('/transactions', GetAllTransactions);
 
 StripeRoute.get('/orders', GetAllOrders);
+
+StripeRoute.get('/product-orders', GetOrdersDB);
 
 StripeRoute.get('/checkout-sessions', GetAllSessions);
 

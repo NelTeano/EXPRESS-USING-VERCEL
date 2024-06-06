@@ -1,5 +1,7 @@
 import ProductModel from "../models/Product.js";
 import UserModel from "../models/User.js";
+import OrderModel from "../models/Order.js";
+
 
 // GET ALL THE PRODUCTS
 const getProducts = async (req, res) => {
@@ -101,7 +103,6 @@ const getLikedProduct = async (req, res) => {
 }
 
 
-
 const saveProduct = async (req, res) => {
 
     const product = new ProductModel({
@@ -124,7 +125,6 @@ const saveProduct = async (req, res) => {
         res.status(400).json({ message: "Error adding products", error });
     }
 }
-
 
 
 export { getProducts, saveProduct, getFilteredProducts, likeProduct, getLikedProduct } 

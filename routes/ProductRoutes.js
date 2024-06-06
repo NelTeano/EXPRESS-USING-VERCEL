@@ -1,7 +1,13 @@
 import express from "express";
 
 // CONTROLLERS
-import { getProducts, saveProduct, getFilteredProducts, likeProduct, getLikedProduct} from '../controllers/productControllers.js'
+import { 
+    getProducts,
+    saveProduct,
+    getFilteredProducts,
+    likeProduct,
+    getLikedProduct,
+} from '../controllers/productControllers.js'
 
 const productRoute = express.Router();
 
