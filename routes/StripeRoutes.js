@@ -22,18 +22,35 @@ const stripePackage = stripe(
     process.env.STRIPE_SECRET_KEY,
 );
 
+const webhookSecret =  process.env.ENDPOINT_SECRET
 
 const StripeRoute = express.Router();
 
-
-
 StripeRoute.post('/webhook', express.raw({type: 'application/json'}), async (request, response) => {
-        const sig = request.headers['stripe-signature'];
     
+        const sig = request.headers['stripe-signature'];
+
+        // const payload = {
+        //     id: 'evt_test_webhook',
+        //     object: 'checkout.session.completed',
+        // };
+        // const payloadString = JSON.stringify(payload, null, 2);
+        // const secret = 'whsec_test_secret';
+
+        // Log headers and environment variable
+        // console.log("Received signature:", sig);
+        // console.log("Endpoint secret:", process.env.ENDPOINT_SECRET);
+        // const rawBody = request.body.toString();
+        // console.log('Raw body:', rawBody);
+        // console.log('Signature:', sig);
+
+        // console.log('Signature:', payloadString, header);
+
         let event;
     
+    
         try {
-            event = await stripePackage.webhooks.constructEvent(request.body, sig, process.env.ENDPOINT_SECRET);
+            event = await stripePackage.webhooks.constructEvent(request.body, sig, webhookSecret);
         } catch (err) {
             console.log(`❌ Error message: ${err.message}`);
             response.status(400).send(`Webhook Error: ${err.message}`);
