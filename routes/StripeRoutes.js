@@ -23,6 +23,7 @@ const stripePackage = stripe(
 );
 
 const webhookSecret =  process.env.ENDPOINT_SECRET
+console.log(webhookSecret)
 
 const StripeRoute = express.Router();
 
@@ -30,24 +31,7 @@ StripeRoute.post('/webhook', express.raw({type: 'application/json'}), async (req
     
         const sig = request.headers['stripe-signature'];
 
-        // const payload = {
-        //     id: 'evt_test_webhook',
-        //     object: 'checkout.session.completed',
-        // };
-        // const payloadString = JSON.stringify(payload, null, 2);
-        // const secret = 'whsec_test_secret';
-
-        // Log headers and environment variable
-        // console.log("Received signature:", sig);
-        // console.log("Endpoint secret:", process.env.ENDPOINT_SECRET);
-        // const rawBody = request.body.toString();
-        // console.log('Raw body:', rawBody);
-        // console.log('Signature:', sig);
-
-        // console.log('Signature:', payloadString, header);
-
         let event;
-    
     
         try {
             event = await stripePackage.webhooks.constructEvent(request.body, sig, webhookSecret);
@@ -56,7 +40,6 @@ StripeRoute.post('/webhook', express.raw({type: 'application/json'}), async (req
             response.status(400).send(`Webhook Error: ${err.message}`);
             return;
         }
-        
         
         // Handle the event
         switch (event.type) {
@@ -81,12 +64,13 @@ StripeRoute.post('/webhook', express.raw({type: 'application/json'}), async (req
                 };
 
                 const Order = new OrderModel(orderData);
-                await Order.save();
+                const saveOrder = await Order.save();
 
                 console.log("Success! Checkout session completed.");
                 console.log("Checkout Session:", checkoutSessionCompleted);
                 console.log("Line of Items :", lineItems);
-
+                response.json({received: true, order: saveOrder}); // Sending response here
+                return; // End execution after sending the response
             } catch (err) {
                 console.log(`❌ Error retrieving payment method: ${err.message}`);
             }
