@@ -17,11 +17,22 @@ const UserSchema = mongoose.Schema({
         type: Array,
         required: true
     },
+    cart: {
+        type: Array,
+        required: true
+    },
+    donated_charities: {
+        type: Array,
+        required: true
+    },
+    donated_orgs: {
+        type: Array,
+        required: true
+    },
     isRegistered: {
         type: Boolean,
         required: true
     },
-
 })
 
 const UserModel = mongoose.model("users", UserSchema)

@@ -33,6 +33,9 @@ const saveUser = async (req, res) => {
         full_name: req.body.name,
         email: req.body.email,
         product_liked: req.body.prod_liked,
+        cart: req.body.user_cart,
+        donated_charities: req.body.charities,
+        donated_orgs: req.body.orgs,
         isRegistered: req.body.isRegistered,
     })
 
