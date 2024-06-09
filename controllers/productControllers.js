@@ -80,6 +80,32 @@ const likeProduct = async (req, res) => {
     }
 }
 
+const addToCartProduct = async (req, res) => {
+    
+    const userEmail = req.params.email;
+    const productId = req.params.prod_id;
+
+    try {
+        
+        const findUser = await UserModel.findOne({ email: userEmail });
+
+        if (!findUser) {
+            return res.status(404).json({ message: 'No Exiting User or Login to Register Data' });
+        }
+
+        const updatedUser = await UserModel.findByIdAndUpdate(
+            findUser._id, 
+            { $push: { cart: productId } },
+            { new: true }
+        );
+
+        res.json({ message: 'Add to cart successfully', updatedData: updatedUser, oldData: findUser});
+    } catch (err) {
+        console.error(`Error: ${err}`);
+        res.status(500).send({ success: false, message: "An error occurred while adding to cart the product.", error: err });
+    }
+}
+
 const getLikedProduct = async (req, res) => {
 
     const userEmail = req.params.email;
@@ -127,4 +153,11 @@ const saveProduct = async (req, res) => {
 }
 
 
-export { getProducts, saveProduct, getFilteredProducts, likeProduct, getLikedProduct } 
+export { 
+    getProducts,
+    saveProduct, 
+    getFilteredProducts, 
+    likeProduct, 
+    getLikedProduct, 
+    addToCartProduct 
+} 

@@ -7,6 +7,7 @@ import {
     getFilteredProducts,
     likeProduct,
     getLikedProduct,
+    addToCartProduct
 } from '../controllers/productControllers.js'
 
 const productRoute = express.Router();
@@ -16,5 +17,6 @@ productRoute.get('/filtered-products/:organization/:category', getFilteredProduc
 productRoute.get('/product-liked/:email', getLikedProduct);
 productRoute.post('/shop-add-product', saveProduct);
 productRoute.put('/like-product/:email/:prod_id', likeProduct);
+productRoute.put('/add-product-cart/:email/:prod_id', addToCartProduct);
 
 export default productRoute;
